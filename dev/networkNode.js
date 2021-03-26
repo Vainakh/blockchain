@@ -84,7 +84,12 @@ app.post('/register-and-broadcast-node', (req, res) => {
 
 //register a node with the network
 app.post('/register-node', () => {
+  const newNodeUrl = req.body.newNodeUrl;
+  const nodeNotAlreadyPresent = bidcoin.networkNodes.indexOf((newNodeUrl == -1));
+  const notCurrentNode = bidcoin.currentNodeUrl !== newNodeUrl;
 
+  if (nodeNotAlreadyPresent && notCurrentNode) bidcoin.networkNodes.push(newNodeUrl);
+  res.json({ note: "New node registered successfully with node."})
 });
 
 //register multiple nodes at once
