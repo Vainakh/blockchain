@@ -1,13 +1,16 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const Blockchain = require('./blockchain');
+const { v1: uuidv1 } = require('uuid');
+
+const nodeAddress = uuidv1().split('-').join('');
 
 const bidcoin = new Blockchain();
 
 const app = express();
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false}))
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get('/blockchain', (req, res) => {
   res.send(bidcoin);
@@ -19,7 +22,23 @@ app.post('/transaction', (req, res) => {
 });
 
 app.get('/mine', (req, res) => {
-  
+  const lastBlock = bidcoin.getLastBlock();
+  const previousBlockHash = lastBlock['hash'];
+  const  currentBlockData = {
+    transctions: bidcoin.pendingTransactions,
+    index: lastBlock['index'] + 1
+  }
+  const nonce = bidcoin.proofOfWork(previousBlockHash, currentBlockData);
+  const blockHash = bitcoin.hashBlock(previousBlockHash, currentBlockData, nonce);
+
+  bidcoin.createNewTransaction(12.5, "00", nodeAddress);
+
+  const newBlock = bidcoin.createNewBlock(nonce, previousBlockHash, currentBlockHash);
+  res.json({
+    note: "New block mined successfully",
+    block: newBlock
+  });
+
 });
 
 app.listen(3000, () => {
